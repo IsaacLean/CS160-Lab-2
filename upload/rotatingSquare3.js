@@ -120,7 +120,8 @@ window.onload = function init()
     };
 
     window.onmousedown = function ( event ) {
-        console.log(event.pageX, event.pageY);
+        console.log(event.pageX, event.pageY)
+        gl.viewport( event.pageX - 400, -(event.pageY - 20), canvas.width, canvas.height );
     }
 
     render();
