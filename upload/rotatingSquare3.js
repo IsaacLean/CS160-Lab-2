@@ -11,6 +11,9 @@ var points = [];
 var NumTimesToSubdivide = 5;
 var offsetVal = 50 * 0.001;
 
+var colorChange = vec4( 1.0, 0.0, 0.0, 1.0 );
+var colorLoc;
+
 window.onload = function init()
 {
     var canvas = document.getElementById( "gl-canvas" );
@@ -63,11 +66,11 @@ window.onload = function init()
     gl.enableVertexAttribArray( vPosition );
 
     //thetaLoc = gl.getUniformLocation(program, "theta");
+    colorLoc = gl.getUniformLocation(program, "colorChange");
 
     // Initialize event handlers
     
     document.getElementById("slider").onchange = function(event) {
-        //speed = 100 - event.target.value;
         offsetVal = event.target.value * 0.001;
         while(points.length !== 0) points.pop();
         divideTriangle( vertices[0], vertices[1], vertices[2],
@@ -75,7 +78,11 @@ window.onload = function init()
         gl.bufferData( gl.ARRAY_BUFFER, flatten(points), gl.STATIC_DRAW );
     };
     document.getElementById("Direction").onclick = function () {
-        direction = !direction;
+        offsetVal = 50 * 0.001;
+        while(points.length !== 0) points.pop();
+        divideTriangle( vertices[0], vertices[1], vertices[2],
+                    NumTimesToSubdivide);
+        gl.bufferData( gl.ARRAY_BUFFER, flatten(points), gl.STATIC_DRAW );
     };
     
     document.getElementById("Controls").onclick = function( event) {
@@ -98,18 +105,23 @@ window.onload = function init()
         var key = String.fromCharCode(event.keyCode);
         switch( key ) {
           case '1':
-            direction = !direction;
+            //direction = !direction;
+            colorChange = vec4( 1.0, 0.0, 0.0, 1.0 );
             break;
 
           case '2':
-            speed /= 2.0;
+            colorChange = vec4( 0.0, 1.0, 0.0, 1.0 );
             break;
 
           case '3':
-            speed *= 2.0;
+            colorChange = vec4( 0.0, 0.0, 1.0, 1.0 );
             break;
         }
     };
+
+    window.onmousedown = function ( event ) {
+        console.log(event.pageX, event.pageY);
+    }
 
     render();
 };
@@ -164,6 +176,7 @@ function render()
 
     theta += (direction ? 0.1 : -0.1);
     gl.uniform1f(thetaLoc, theta);
+    gl.uniform4f(colorLoc, colorChange[0], colorChange[1], colorChange[2], colorChange[3]);
 
     gl.drawArrays( gl.LINES, 0, points.length );
 
