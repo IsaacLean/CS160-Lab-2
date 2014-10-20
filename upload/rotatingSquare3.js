@@ -1,4 +1,4 @@
-
+var canvas;
 var gl;
 
 var theta = 0.0;
@@ -18,7 +18,7 @@ var mouseDown = false;
 
 window.onload = function init()
 {
-    var canvas = document.getElementById( "gl-canvas" );
+    canvas = document.getElementById( "gl-canvas" );
     
     gl = WebGLUtils.setupWebGL( canvas );
     if ( !gl ) { alert( "WebGL isn't available" ); }
@@ -130,8 +130,9 @@ window.onload = function init()
     }
 
     window.onmousemove = function ( event ) {
-        if(mouseDown)
+        if(mouseDown && (event.target.id === "gl-canvas")) {
             gl.viewport( event.pageX - 400, -(event.pageY - 20), canvas.width, canvas.height );
+        }
     }
 
 
