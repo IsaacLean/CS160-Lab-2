@@ -85,6 +85,8 @@ window.onload = function init()
         divideTriangle( vertices[0], vertices[1], vertices[2],
                     NumTimesToSubdivide);
         gl.bufferData( gl.ARRAY_BUFFER, flatten(points), gl.STATIC_DRAW );
+        colorChange = vec4( 1.0, 0.0, 0.0, 1.0 );
+        gl.viewport( 0, 0, canvas.width, canvas.height );
     };
 
     window.onkeydown = function( event ) {
