@@ -9,7 +9,7 @@ var direction = true;
 
 var points = [];
 var NumTimesToSubdivide = 5;
-const offsetVal = 0.01;
+var offsetVal = 50 * 0.001;
 
 window.onload = function init()
 {
@@ -17,12 +17,24 @@ window.onload = function init()
     
     gl = WebGLUtils.setupWebGL( canvas );
     if ( !gl ) { alert( "WebGL isn't available" ); }
+        
+    //
+    //  Initialize our data for the Sierpinski Gasket
+    //
 
+    // First, initialize the corners of our gasket with three points.
+    
     var vertices = [
         vec2( -1, -1 ),
         vec2(  0,  1 ),
         vec2(  1, -1 )
     ];
+
+    /*var vertices = [
+        vec2( RNG(-1.5, -0.5), RNG(-1.5, -0.5) ),
+        vec2(  RNG(-0.5, 0.5),  RNG(0.5, 1.5) ),
+        vec2(  RNG(0.5, 1.5), RNG(-1.5, -0.5) )
+    ];*/
 
     divideTriangle( vertices[0], vertices[1], vertices[2],
                     NumTimesToSubdivide);
@@ -38,24 +50,29 @@ window.onload = function init()
     var program = initShaders( gl, "vertex-shader", "fragment-shader" );
     gl.useProgram( program );
 
-    // Load the data into the GPU    
+    // Load the data into the GPU
     
     var bufferId = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, bufferId);
-    gl.bufferData(gl.ARRAY_BUFFER, flatten(vertices), gl.STATIC_DRAW);
+    gl.bindBuffer( gl.ARRAY_BUFFER, bufferId );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(points), gl.STATIC_DRAW );
 
     // Associate out shader variables with our data buffer
     
     var vPosition = gl.getAttribLocation( program, "vPosition" );
     gl.vertexAttribPointer( vPosition, 2, gl.FLOAT, false, 0, 0 );
-    gl.enableVertexAttribArray(vPosition);
-    
-    thetaLoc = gl.getUniformLocation(program, "theta");
-    
+    gl.enableVertexAttribArray( vPosition );
+
+    //thetaLoc = gl.getUniformLocation(program, "theta");
+
     // Initialize event handlers
     
     document.getElementById("slider").onchange = function(event) {
-        speed = 100 - event.target.value;
+        //speed = 100 - event.target.value;
+        offsetVal = event.target.value * 0.001;
+        while(points.length !== 0) points.pop();
+        divideTriangle( vertices[0], vertices[1], vertices[2],
+                    NumTimesToSubdivide);
+        gl.bufferData( gl.ARRAY_BUFFER, flatten(points), gl.STATIC_DRAW );
     };
     document.getElementById("Direction").onclick = function () {
         direction = !direction;
@@ -94,7 +111,6 @@ window.onload = function init()
         }
     };
 
-
     render();
 };
 
@@ -124,12 +140,12 @@ function divideTriangle( a, b, c, count )
         var bc = mix( b, c, 0.5 );
         //console.log(ab, ac, bc);
 
-        ab[0] = ab[0] + 0.02;
-        ab[1] = ab[1] - 0.004;
-        ac[0] = ac[0] + 0.01;
-        ac[1] = ac[1] - 0.007;
-        bc[0] = bc[0] + 0.008;
-        bc[1] = bc[1] - 0.03;
+        ab[0] = ab[0] + 0.02 + offsetVal;
+        ab[1] = ab[1] - 0.004 + offsetVal;
+        ac[0] = ac[0] + 0.01 + offsetVal;
+        ac[1] = ac[1] - 0.007 + offsetVal;
+        bc[0] = bc[0] + 0.008 + offsetVal;
+        bc[1] = bc[1] - 0.03 + offsetVal;
         //console.log(ab, ac, bc);
 
         --count;
