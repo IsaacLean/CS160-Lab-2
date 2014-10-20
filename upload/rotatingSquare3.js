@@ -14,6 +14,8 @@ var offsetVal = 50 * 0.001;
 var colorChange = vec4( 1.0, 0.0, 0.0, 1.0 );
 var colorLoc;
 
+var mouseDown = false;
+
 window.onload = function init()
 {
     var canvas = document.getElementById( "gl-canvas" );
@@ -120,9 +122,18 @@ window.onload = function init()
     };
 
     window.onmousedown = function ( event ) {
-        console.log(event.pageX, event.pageY)
-        gl.viewport( event.pageX - 400, -(event.pageY - 20), canvas.width, canvas.height );
+        mouseDown = true;
     }
+
+    window.onmouseup = function ( event ) {
+        mouseDown = false;
+    }
+
+    window.onmousemove = function ( event ) {
+        if(mouseDown)
+            gl.viewport( event.pageX - 400, -(event.pageY - 20), canvas.width, canvas.height );
+    }
+
 
     render();
 };
