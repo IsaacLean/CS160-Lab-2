@@ -115,7 +115,7 @@ window.onload = function init()
 
     window.onmousemove = function ( event ) {
         if(mouseDown && (event.target.id === "gl-canvas")) {
-            gl.viewport( event.pageX - 400, -(event.pageY - 20), canvas.width, canvas.height );
+            gl.viewport( event.pageX - canvas.offsetLeft, -(event.pageY - canvas.offsetTop), canvas.width, canvas.height );
         }
     }
 
