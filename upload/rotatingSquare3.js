@@ -7,12 +7,25 @@ var thetaLoc;
 var speed = 100;
 var direction = true;
 
+var points = [];
+var NumTimesToSubdivide = 5;
+const offsetVal = 0.01;
+
 window.onload = function init()
 {
     var canvas = document.getElementById( "gl-canvas" );
     
     gl = WebGLUtils.setupWebGL( canvas );
     if ( !gl ) { alert( "WebGL isn't available" ); }
+
+    var vertices = [
+        vec2( -1, -1 ),
+        vec2(  0,  1 ),
+        vec2(  1, -1 )
+    ];
+
+    divideTriangle( vertices[0], vertices[1], vertices[2],
+                    NumTimesToSubdivide);
 
     //
     //  Configure WebGL
@@ -24,13 +37,6 @@ window.onload = function init()
     
     var program = initShaders( gl, "vertex-shader", "fragment-shader" );
     gl.useProgram( program );
-
-    var vertices = [
-        vec2( 0,  1),
-        vec2( 1,  0),
-        vec2(-1,  0 ),
-        vec2( 0, -1)
-    ];
 
     // Load the data into the GPU    
     
@@ -92,6 +98,50 @@ window.onload = function init()
     render();
 };
 
+function triangle( a, b, c )
+{
+    points.push( a, b, b, c, c, a );
+}
+
+function divideTriangle( a, b, c, count )
+{
+    /*a2 = RNG(a - 0.5, a + 0.5);
+    b2 = RNG(b - 0.5, b + 0.5);
+    c2 = RNG(c - 0.5, c + 0.5);
+    console.log(a2, b2, c2)*/
+
+    // check for end of recursion
+    
+    if ( count === 0 ) {
+        triangle( a, b, c );
+    }
+    else {
+    
+        //bisect the sides
+
+        var ab = mix( a, b, 0.5 );
+        var ac = mix( a, c, 0.5 );
+        var bc = mix( b, c, 0.5 );
+        //console.log(ab, ac, bc);
+
+        ab[0] = ab[0] + 0.02;
+        ab[1] = ab[1] - 0.004;
+        ac[0] = ac[0] + 0.01;
+        ac[1] = ac[1] - 0.007;
+        bc[0] = bc[0] + 0.008;
+        bc[1] = bc[1] - 0.03;
+        //console.log(ab, ac, bc);
+
+        --count;
+
+        // three new triangles
+        
+        divideTriangle( a, ab, ac, count );
+        divideTriangle( c, ac, bc, count );
+        divideTriangle( b, bc, ab, count );
+    }
+}
+
 function render()
 {
     gl.clear( gl.COLOR_BUFFER_BIT );
@@ -99,7 +149,7 @@ function render()
     theta += (direction ? 0.1 : -0.1);
     gl.uniform1f(thetaLoc, theta);
 
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    gl.drawArrays( gl.LINES, 0, points.length );
 
     setTimeout(
         function () {requestAnimFrame( render );},
