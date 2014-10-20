@@ -86,22 +86,6 @@ window.onload = function init()
                     NumTimesToSubdivide);
         gl.bufferData( gl.ARRAY_BUFFER, flatten(points), gl.STATIC_DRAW );
     };
-    
-    document.getElementById("Controls").onclick = function( event) {
-        switch(event.target.index) {
-          case 0:
-            direction = !direction;
-            break;
-
-         case 1:
-            speed /= 2.0;
-            break;
-
-         case 2:
-            speed *= 2.0;
-            break;
-       }
-    };
 
     window.onkeydown = function( event ) {
         var key = String.fromCharCode(event.keyCode);
